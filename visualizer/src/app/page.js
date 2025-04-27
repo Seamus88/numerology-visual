@@ -20,13 +20,21 @@ export default function Home() {
     } else if (fromDate > toDate) {
       alert("Please select choices in chronological order.");
       return;
-    } 
+    } else if (new Date(toDate).getFullYear() - new Date(fromDate).getFullYear() > 50){
+      
+      console.log(toDate - fromDate);
+      alert("Please select a date range of less than 50 years.");
+      return;
+    }
     
     for (let i = fromDate; i <= toDate; i.setDate(i.getDate() + 1)) {
       const year = i.getFullYear();
       const month = i.getMonth() + 1;
-
-      if (holdYear !== year && holdMonth !== month) {
+      if (holdYear === 0 && holdMonth === 0) {
+        holdYear = year;
+        holdMonth = month;
+        datesArrayTemp.push([year, month]);
+      } else if (holdYear !== year && holdMonth !== month) {
         holdYear = year;
         holdMonth = month;
         datesArrayTemp.push([0, 0]);
@@ -120,6 +128,8 @@ function CreateTable({dates}) {
 function TBody({dateArray}) {
   const datesToMonths = {"0": 31, "1": 31, "2": 28, "3": 31, "4": 30, "5": 31, "6": 30, "7": 31, "8": 31, "9": 30, "10": 31, "11": 30, "12": 31};  
 
+
+
   return (
     <tbody>
       {dateArray.map((yearAndMonth, index) => {
@@ -137,12 +147,15 @@ function TR({date, datesToMonths}) {
   for(let i = 1; i <= datesToMonths; i++) {
     daysInMonth.push(i);
   }
-  
+  //Leap year add additional day
+  if (date[1] === 2 && ((date[0] % 4 === 0 && date[0] % 100 !== 0) || (date[0] % 400 === 0))) {
+    daysInMonth.push(29);
+  }
 
   return (
     <tr>
-      {date[0] === 0? <td className="border border-gray-600">Year</td> : <td className="border border-gray-600 p-2">{date[0]}</td>}
-      {date[1] === 0? <td className="border border-gray-600">Month</td> : <td className="border border-gray-600 p-2">{date[1]}</td>}
+      {date[0] === 0? <td className="border border-gray-600 p-2">Year</td> : <td className="border border-gray-600 p-2">{date[0]}</td>}
+      {date[1] === 0? <td className="border border-gray-600 p-2">Month</td> : <td className="border border-gray-600 p-2">{date[1]}</td>}
       {daysInMonth.map((day) => {
         return (
           <TD key={day} year={date[0]} month={date[1]} day={day} />
